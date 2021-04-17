@@ -97,8 +97,7 @@ window.addEventListener("DOMContentLoaded", () => {
   //Modal
 
   const modalTrigger = document.querySelectorAll("[data-modal]"),
-    modal = document.querySelector(".modal"),
-    modalCloseBtn = document.querySelector("[data-close]");
+    modal = document.querySelector(".modal");
 
   modalTrigger.forEach((btn) => {
     btn.addEventListener("click", openModal);
@@ -115,11 +114,10 @@ window.addEventListener("DOMContentLoaded", () => {
     modal.classList.remove("show");
     document.body.style.overflow = ""; //при закрытии чтобы скролл вернулся
   }
-  modalCloseBtn.addEventListener("click", closeModal);
 
   modal.addEventListener("click", (e) => {
     //нажатие вокруг окна закроет его
-    if (e.target === modal) {
+    if (e.target === modal || e.target.getAttribute('data-close') == '') {
       closeModal();
     }
   });
@@ -130,7 +128,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  const modalTimerId = setTimeout(openModal, 5000);
+  const modalTimerId = setTimeout(openModal, 50000);
 
   function showModalByScroll() {
     if (
@@ -166,10 +164,10 @@ window.addEventListener("DOMContentLoaded", () => {
     render() {
       const element = document.createElement("div");
       console.log(this.classes)
-      if(this.classes.length === 0){
+      if (this.classes.length === 0) {
         this.element = 'menu__item';
         element.classList.add(this.element);
-      }else {
+      } else {
         this.classes.forEach(className => element.classList.add(className))
       }
       element.innerHTML = `
@@ -210,16 +208,93 @@ window.addEventListener("DOMContentLoaded", () => {
     14,
     '.menu .container',
   ).render();
+
+  //Forms
+
+  const forms = document.querySelectorAll('form');
+
+  const message = {
+    loading: 'img/form/spinner.svg',
+    success: 'Спасибо! Скоро мы с вами свяжемся',
+    failure: 'Что-то пошло не так...'
+  };
+
+  forms.forEach(item => {
+    postData(item);
+  });
+
+  function postData(form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const statusMessage = document.createElement('img');
+      statusMessage.src = message.loading;
+      statusMessage.style.cssText = `
+      dispaly: block;
+      margin: 0 auto;
+      `;
+      form.insertAdjacentElement('afterend', statusMessage)
+
+
+      const formData = new FormData(form);
+
+      const object = {};
+      formData.forEach(function (value, key) {
+        object[key] = value;
+      });
+
+
+      fetch('js/server.php', {
+        method: "POST",
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(object)
+      })
+      .then(data => data.text())
+      .then(data =>{
+          console.log(data);
+          showThanksModal(message.success);
+          statusMessage.remove();
+      }).catch(() => { //error
+        showThanksModal(message.failure);
+      }).finally(() => {
+        form.reset();
+      })
+    });
+  }
+
+  function showThanksModal(message) {
+    const prevModalDialog = document.querySelector('.modal__dialog');
+
+    prevModalDialog.classList.add('hide');
+    openModal();
+
+    const thanksModal = document.createElement('div');
+    thanksModal.classList.add('modal__dialog');
+    thanksModal.innerHTML = `
+    <div class="modal__content">
+         <div class="modal__close" data-close>×</div>
+         <div class="modal__title">${message}</div>
+    </div>
+    `;
+
+    document.querySelector('.modal').append(thanksModal);
+    setTimeout(() => {
+      thanksModal.remove();
+      prevModalDialog.classList.add('show');
+      prevModalDialog.classList.remove('hide');
+      closeModal();
+    }, 4000)
+  }
+
+  fetch('https://jsonplaceholder.typicode.com/posts', {
+    method: 'POST',
+    body: JSON.stringify({name: 'Alex'}),
+    headers:{
+      'Content-type': 'application/json'
+    }
+  })
+        .then(response => response.json())
+        .then(json => console.log(json));
 });
-
-// const log = function (a, b, ...rest){
-// console.log(a, b, rest)
-// }
-// log('basic', 'rest', 'operator', 'usage', 'lol')
-
-
-// function calcOrDouble(number, basis = 2){
-//   console.log(number * basis);
-// }
-
-// calcOrDouble(3);
