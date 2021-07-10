@@ -117,7 +117,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   modal.addEventListener("click", (e) => {
     //нажатие вокруг окна закроет его
-    if (e.target === modal || e.target.getAttribute('data-close') == '') {
+    if (e.target === modal || e.target.getAttribute("data-close") == "") {
       closeModal();
     }
   });
@@ -163,12 +163,11 @@ window.addEventListener("DOMContentLoaded", () => {
     }
     render() {
       const element = document.createElement("div");
-      console.log(this.classes)
       if (this.classes.length === 0) {
-        this.element = 'menu__item';
+        this.element = "menu__item";
         element.classList.add(this.element);
       } else {
-        this.classes.forEach(className => element.classList.add(className))
+        this.classes.forEach((className) => element.classList.add(className));
       }
       element.innerHTML = `
                           <img src=${this.src} alt=${this.alt}>
@@ -184,94 +183,100 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  new MenuCard(
-    "img/tabs/vegy.jpg",
-    "vegy",
-    'Меню "Фитнес"',
-    'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-    9,
-    '.menu .container',
-  ).render();
-  new MenuCard(
-    "img/tabs/elite.jpg",
-    "elite",
-    'Меню “Премиум”',
-    'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-    7,
-    '.menu .container',
-  ).render();
-  new MenuCard(
-    "img/tabs/post.jpg",
-    "post",
-    'Меню "Постное"',
-    'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков. ',
-    14,
-    '.menu .container',
-  ).render();
+  const getResource = async (url) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+    }
+    return await res.json();
+  };
+
+  getResource('http://localhost:3000/menu')
+      .then(data => {
+        data.forEach(({img, altimg, title, descr, price}) => {
+          new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+        })
+      });
+
+  // axios.get("http://localhost:3000/menu").then((data) => {
+  //   data.data.forEach(({ img, altimg, title, descr, price }) => {
+  //     new MenuCard(
+  //       img,
+  //       altimg,
+  //       title,
+  //       descr,
+  //       price,
+  //       ".menu .container"
+  //     ).render();
+  //   });
+  // });
 
   //Forms
 
-  const forms = document.querySelectorAll('form');
+  const forms = document.querySelectorAll("form");
 
   const message = {
-    loading: 'img/form/spinner.svg',
-    success: 'Спасибо! Скоро мы с вами свяжемся',
-    failure: 'Что-то пошло не так...'
+    loading: "img/form/spinner.svg",
+    success: "Спасибо! Скоро мы с вами свяжемся",
+    failure: "Что-то пошло не так...",
   };
 
-  forms.forEach(item => {
-    postData(item);
+  forms.forEach((item) => {
+    bindpostData(item);
   });
 
-  function postData(form) {
-    form.addEventListener('submit', (e) => {
+  const postData = async (url, data) => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    return await res.json();
+  };
+
+  function bindpostData(form) {
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
 
-      const statusMessage = document.createElement('img');
+      const statusMessage = document.createElement("img");
       statusMessage.src = message.loading;
       statusMessage.style.cssText = `
       dispaly: block;
       margin: 0 auto;
       `;
-      form.insertAdjacentElement('afterend', statusMessage)
-
+      form.insertAdjacentElement("afterend", statusMessage);
 
       const formData = new FormData(form);
 
-      const object = {};
-      formData.forEach(function (value, key) {
-        object[key] = value;
-      });
+      const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-
-      fetch('js/server.php', {
-        method: "POST",
-        headers: {
-          'Content-type': 'application/json'
-        },
-        body: JSON.stringify(object)
-      })
-      .then(data => data.text())
-      .then(data =>{
+      postData("http://localhost:3000/requests", json)
+        .then((data) => {
           console.log(data);
           showThanksModal(message.success);
           statusMessage.remove();
-      }).catch(() => { //error
-        showThanksModal(message.failure);
-      }).finally(() => {
-        form.reset();
-      })
+        })
+        .catch(() => {
+          //error
+          showThanksModal(message.failure);
+        })
+        .finally(() => {
+          form.reset(); // метод очищает форму
+        });
     });
   }
 
   function showThanksModal(message) {
-    const prevModalDialog = document.querySelector('.modal__dialog');
+    const prevModalDialog = document.querySelector(".modal__dialog");
 
-    prevModalDialog.classList.add('hide');
+    prevModalDialog.classList.add("hide");
     openModal();
 
-    const thanksModal = document.createElement('div');
-    thanksModal.classList.add('modal__dialog');
+    const thanksModal = document.createElement("div");
+    thanksModal.classList.add("modal__dialog");
     thanksModal.innerHTML = `
     <div class="modal__content">
          <div class="modal__close" data-close>×</div>
@@ -279,23 +284,65 @@ window.addEventListener("DOMContentLoaded", () => {
     </div>
     `;
 
-    document.querySelector('.modal').append(thanksModal);
+    document.querySelector(".modal").append(thanksModal);
     setTimeout(() => {
       thanksModal.remove();
-      prevModalDialog.classList.add('show');
-      prevModalDialog.classList.remove('hide');
+      prevModalDialog.classList.add("show");
+      prevModalDialog.classList.remove("hide");
       closeModal();
-    }, 4000)
+    }, 4000);
   }
 
-  fetch('https://jsonplaceholder.typicode.com/posts', {
-    method: 'POST',
-    body: JSON.stringify({name: 'Alex'}),
-    headers:{
-      'Content-type': 'application/json'
-    }
+  fetch("db.json")
+    .then((data) => data.json())
+    .then((res) => console.log(res));
+
+  fetch("https://jsonplaceholder.typicode.com/posts", {
+    method: "POST",
+    body: JSON.stringify({ name: "Alex" }),
+    headers: {
+      "Content-type": "application/json",
+    },
   })
-        .then(response => response.json())
-        .then(json => console.log(json));
+    .then((response) => response.json())
+    .then((json) => console.log(json));
+
+  // Slider
+
+  const slides = document.querySelectorAll('.offer__slide'),
+        prev = document.querySelector('.offer__slider-prev'),
+        next = document.querySelector('.offer__slider-next');
+
+  let slideIndex = 1;
+
+  showSlides(slideIndex);
+
+  function showSlides(n){
+    if(n > slides.length){
+      slideIndex = 1;
+    }
+
+    if(n < 1){
+      slideIndex = slides.length;
+    }
+    slides.forEach(item => item.style.display = 'none');
+    slides[slideIndex - 1].style.display = 'block';
+  }
+
+  
+
+  
+
+  function plusSlides(n){
+    showSlides(slideIndex += n);
+  }
+
+  prev.addEventListener('click', () => {
+    plusSlides(-1)
+  });
+  next.addEventListener('click', () => {
+    plusSlides(1)
+  });
+
 });
 

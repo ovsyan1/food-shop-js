@@ -1,16 +1,16 @@
 {
   "name": "food-shop",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.1.1",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ovsyan1/food-shop-js.git"
   },
-  "author": "",
+  "author": "Ovsiannik Kyrylo",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ovsyan1/food-shop-js/issues"
@@ -18,5 +18,9 @@
   "homepage": "https://github.com/ovsyan1/food-shop-js#readme",
   "devDependencies": {
     "json-server": "^0.16.3"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.7"
   }
 }
