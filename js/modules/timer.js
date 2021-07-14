@@ -1,7 +1,6 @@
-function timer(){
+function timer(id, deadline){
     //Timer
-
-  const deadline = "2021-09-19";
+    
 
   function getTimeRemaining(endtime) {
     const t = Date.parse(endtime) - Date.parse(new Date()),
@@ -26,7 +25,7 @@ function timer(){
       return num;
     }
   }
-
+  let timeInterval;
   function setClock(selector, endtime) {
     const timer = document.querySelector(selector),
       days = timer.querySelector("#days"),
@@ -53,7 +52,7 @@ function timer(){
       }
     }
   }
-  setClock(".timer", deadline);
+  setClock(id, deadline);
 
   
 
@@ -73,4 +72,4 @@ function timer(){
   // });
 }
 
-module.exports = timer;
+export default timer;
