@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/ovsyan1/food-shop-js#readme",
   "devDependencies": {
-    "json-server": "^0.16.3"
+    "json-server": "^0.16.3",
+    "webpack-cli": "^4.7.2"
   },
   "dependencies": {
     "express": "^4.17.1",

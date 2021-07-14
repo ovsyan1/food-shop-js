@@ -14,18 +14,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, 'localhost',() => {
     console.log(`Open ${HOST}${PORT} \n Click Ctrl+C for stop server`);
 });
-
-// const arr = [4, 5, 1, 3, 8];
-
-// const res = arr.reduce((sum, current) => sum + current)
-
-
-
-// const obj = {
-//     aaa: 'persoane',
-//     bbb: 'lol',
-//     ccc: 'persoane'
-// }
-
-// const res = Object.entries(obj).filter(item => item[1] == 'persoane').map(item => item[0])
-// console.log(res);
